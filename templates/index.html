@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered FAQ Generator</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .input-section, .output-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .input-method {
+            border: 2px dashed #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .input-method:hover {
+            border-color: #667eea;
+            background-color: #f7fafc;
+        }
+
+        .input-method.active {
+            border-color: #667eea;
+            background-color: #edf2f7;
+        }
+
+        .input-method i {
+            font-size: 2rem;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .input-method h3 {
+            margin-bottom: 10px;
+            color: #4a5568;
+        }
+
+        .input-method p {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-upload input[type=file] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-upload-label {
+            display: block;
+            padding: 15px;
+            background: #f7fafc;
+            border: 2px dashed #cbd5e0;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-label:hover {
+            background: #edf2f7;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #718096;
+        }
+
+        .btn-secondary:hover {
+            background: #4a5568;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .faq-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .faq-item {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .faq-question {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .faq-answer {
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        .export-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            background: #edf2f7;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #718096;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #c53030;
+        }
+
+        .success {
+            background: #c6f6d5;
+            color: #2f855a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2f855a;
+        }
+
+        .warning {
+            background: #fef5e7;
+            color: #d69e2e;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #d69e2e;
+        }
+
+        .network-error {
+            background: #e6fffa;
+            color: #234e52;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #38b2ac;
+        }
+
+        .file-info {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .file-details {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .file-details i {
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+
+        .file-size {
+            color: #718096;
+            font-size: 0.9rem;
+            font-weight: normal;
+        }
+
+        .upload-status {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .upload-message {
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+
+        .upload-message.success {
+            color: #2f855a;
+        }
+
+        .upload-message.error {
+            color: #c53030;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+            animation: progress-animation 2s ease-in-out infinite;
+        }
+
+        @keyframes progress-animation {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+
+        .file-upload-success {
+            border-color: #2f855a;
+            background: #f0fff4;
+        }
+
+        .file-upload-error {
+            border-color: #c53030;
+            background: #fed7d7;
+        }
+
+        .file-upload-processing {
+            border-color: #667eea;
+            background: #edf2f7;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-robot"></i> AI FAQ Generator</h1>
+            <p>Transform any content into comprehensive FAQs using Google Gemini AI</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Input Section -->
+            <div class="input-section">
+                <h2 class="section-title">
+                    <i class="fas fa-edit"></i>
+                    Input Content
+                </h2>
+
+                <div class="input-methods">
+                    <div class="input-method" onclick="switchInputMethod('text')">
+                        <i class="fas fa-keyboard"></i>
+                        <h3>Text Input</h3>
+                        <p>Paste or type your content directly</p>
+                    </div>
+
+                    <div class="input-method" onclick="switchInputMethod('file')">
+                        <i class="fas fa-file-upload"></i>
+                        <h3>File Upload</h3>
+                        <p>Upload PDF, DOCX, TXT, or MD files</p>
+                    </div>
+
+                    <div class="input-method" onclick="switchInputMethod('url')">
+                        <i class="fas fa-globe"></i>
+                        <h3>Website URL</h3>
+                        <p>Extract content from any website</p>
+                    </div>
+                </div>
+
+                <!-- Text Input -->
+                <div id="text-input" class="input-content hidden">
+                    <div class="form-group">
+                        <label for="content-text">Content:</label>
+                        <textarea id="content-text" placeholder="Paste your content here..."></textarea>
+                    </div>
+                </div>
+
+                <!-- File Upload -->
+                <div id="file-input" class="input-content hidden">
+                    <div class="form-group">
+                        <label>Upload File:</label>
+                        <div class="file-upload">
+                            <input type="file" id="file-upload" accept=".pdf,.docx,.txt,.md">
+                            <label for="file-upload" class="file-upload-label">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <br>Choose a file or drag it here
+                                <br><small>Supported: PDF, DOCX, TXT, MD (Max 16MB)</small>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- File Upload Status -->
+                    <div id="file-status" class="hidden">
+                        <div class="file-info">
+                            <div class="file-details">
+                                <i class="fas fa-file"></i>
+                                <span id="file-name"></span>
+                                <span id="file-size"></span>
+                            </div>
+                            <div class="upload-status">
+                                <span id="upload-message"></span>
+                                <div id="upload-progress" class="progress-bar hidden">
+                                    <div class="progress-fill"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- URL Input -->
+                <div id="url-input" class="input-content hidden">
+                    <div class="form-group">
+                        <label for="content-url">Website URL:</label>
+                        <input type="url" id="content-url" placeholder="https://example.com">
+                    </div>
+                </div>
+
+                <!-- Generation Options -->
+                <div class="form-group">
+                    <label for="num-questions">Number of Questions:</label>
+                    <select id="num-questions">
+                        <option value="5">5 Questions</option>
+                        <option value="10" selected>10 Questions</option>
+                        <option value="15">15 Questions</option>
+                        <option value="20">20 Questions</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="style">Writing Style:</label>
+                    <select id="style">
+                        <option value="professional">Professional</option>
+                        <option value="casual">Casual</option>
+                        <option value="technical">Technical</option>
+                        <option value="simple">Simple</option>
+                    </select>
+                </div>
+
+                <button class="btn" onclick="generateFAQ()">
+                    <i class="fas fa-magic"></i>
+                    Generate FAQ
+                </button>
+
+                <div id="loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Generating FAQ with Gemini AI...</p>
+                    <small>This may take a few moments. Please be patient.</small>
+                </div>
+            </div>
+
+            <!-- Output Section -->
+            <div class="output-section">
+                <h2 class="section-title">
+                    <i class="fas fa-list"></i>
+                    Generated FAQ
+                </h2>
+
+                <div id="stats" class="stats hidden">
+                    <div class="stat-item">
+                        <div class="stat-number" id="question-count">0</div>
+                        <div class="stat-label">Questions</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="word-count">0</div>
+                        <div class="stat-label">Words</div>
+                    </div>
+                </div>
+
+                <div id="faq-output">
+                    <div style="text-align: center; color: #718096; padding: 40px;">
+                        <i class="fas fa-arrow-left" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                        <p>Generate your first FAQ to see results here</p>
+                    </div>
+                </div>
+
+                <div id="export-options" class="export-options hidden">
+                    <button class="btn btn-secondary" onclick="exportFAQ('html')">
+                        <i class="fas fa-download"></i>
+                        Export HTML
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportFAQ('json')">
+                        <i class="fas fa-code"></i>
+                        Export JSON
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentInputMethod = 'text';
+        let generatedFAQ = [];
+
+        function switchInputMethod(method) {
+            // Hide all input methods
+            document.querySelectorAll('.input-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.input-method').forEach(el => el.classList.remove('active'));
+            
+            // Show selected method
+            document.getElementById(method + '-input').classList.remove('hidden');
+            event.currentTarget.classList.add('active');
+            
+            currentInputMethod = method;
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        function showMessage(message, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type;
+            messageDiv.innerHTML = message;
+            
+            const inputSection = document.querySelector('.input-section');
+            inputSection.insertBefore(messageDiv, inputSection.firstChild);
+            
+            setTimeout(() => messageDiv.remove(), 8000);
+        }
+
+        function getContent() {
+            switch(currentInputMethod) {
+                case 'text':
+                    return document.getElementById('content-text').value;
+                case 'file':
+                    return document.getElementById('file-upload').files[0];
+                case 'url':
+                    return document.getElementById('content-url').value;
+                default:
+                    return '';
+            }
+        }
+
+        async function generateFAQ() {
+            let content = getContent();
+            
+            if (!content) {
+                showMessage('Please provide content first', 'error');
+                return;
+            }
+
+            showLoading(true);
+            
+            try {
+                let processedContent = '';
+                
+                if (currentInputMethod === 'file') {
+                    // Show file upload progress
+                    const uploadMessage = document.getElementById('upload-message');
+                    const uploadProgress = document.getElementById('upload-progress');
+                    const fileInfo = document.querySelector('.file-info');
+                    
+                    uploadMessage.textContent = 'Uploading and processing file...';
+                    uploadMessage.className = 'upload-message';
+                    uploadProgress.classList.remove('hidden');
+                    fileInfo.className = 'file-info file-upload-processing';
+                    
+                    const formData = new FormData();
+                    formData.append('file', content);
+                    
+                    const response = await fetch('/upload_file', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const fileResult = await response.json();
+                    
+                    // Hide progress bar
+                    uploadProgress.classList.add('hidden');
+                    
+                    if (!fileResult.success) {
+                        // Show error status
+                        uploadMessage.textContent = `Upload failed: ${fileResult.error}`;
+                        uploadMessage.className = 'upload-message error';
+                        fileInfo.className = 'file-info file-upload-error';
+                        throw new Error(fileResult.error);
+                    }
+                    
+                    // Show success status and update file display
+                    uploadMessage.textContent = `File processed successfully! Extracted ${fileResult.content_length} characters.`;
+                    uploadMessage.className = 'upload-message success';
+                    fileInfo.className = 'file-info file-upload-success';
+                    
+                    // Update the file upload area to show the processed file
+                    const label = document.querySelector('.file-upload-label');
+                    const fileName = document.getElementById('file-name');
+                    const fileSize = document.getElementById('file-size');
+                    
+                    // Update file details with processed information
+                    fileName.textContent = fileResult.filename;
+                    fileSize.textContent = `(${fileResult.content_length} characters extracted)`;
+                    
+                    // Update upload label to show success
+                    label.innerHTML = `
+                        <i class="fas fa-check-circle" style="color: #2f855a;"></i>
+                        <br>File Uploaded Successfully
+                        <br><small>${fileResult.filename}</small>
+                        <br><small style="color: #2f855a;">${fileResult.content_length} characters extracted</small>
+                    `;
+                    
+                    processedContent = fileResult.content;
+                } else if (currentInputMethod === 'url') {
+                    const response = await fetch('/scrape_website', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ url: content })
+                    });
+                    
+                    const urlResult = await response.json();
+                    if (!urlResult.success) {
+                        throw new Error(urlResult.error);
+                    }
+                    
+                    processedContent = urlResult.content;
+                } else {
+                    // For text input, use the content directly
+                    processedContent = content;
+                }
+
+                // Generate FAQ
+                const generateResponse = await fetch('/generate_faq', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        content: processedContent,
+                        num_questions: parseInt(document.getElementById('num-questions').value),
+                        style: document.getElementById('style').value
+                    })
+                });
+
+                const result = await generateResponse.json();
+                
+                if (!result.success) {
+                    throw new Error(result.error);
+                }
+
+                generatedFAQ = result.faq;
+                displayFAQ(result.faq);
+                
+                // Check if there was a network error
+                if (result.faq.length === 1 && result.faq[0].question === "Network Error") {
+                    showMessage(`
+                        <strong>Network Connection Issue</strong><br>
+                        Unable to connect to Gemini API. This could be due to:<br>
+                        • Internet connectivity issues<br>
+                        • API service temporarily unavailable<br>
+                        • Firewall blocking the connection<br><br>
+                        <strong>Solutions:</strong><br>
+                        • Check your internet connection<br>
+                        • Try again in a few minutes<br>
+                        • Verify your API key is correct<br>
+                        • Check if you're behind a corporate firewall
+                    `, 'network-error');
+                } else {
+                    showMessage('FAQ generated successfully!', 'success');
+                }
+                
+            } catch (error) {
+                showMessage(`Error: ${error.message}`, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        function displayFAQ(faqData) {
+            const outputDiv = document.getElementById('faq-output');
+            const statsDiv = document.getElementById('stats');
+            const exportDiv = document.getElementById('export-options');
+            
+            if (faqData.length === 0) {
+                outputDiv.innerHTML = '<div style="text-align: center; color: #718096; padding: 40px;"><p>No FAQ generated</p></div>';
+                statsDiv.classList.add('hidden');
+                exportDiv.classList.add('hidden');
+                return;
+            }
+
+            // Update stats
+            document.getElementById('question-count').textContent = faqData.length;
+            const wordCount = faqData.reduce((total, item) => 
+                total + item.question.split(' ').length + item.answer.split(' ').length, 0);
+            document.getElementById('word-count').textContent = wordCount;
+            
+            statsDiv.classList.remove('hidden');
+            exportDiv.classList.remove('hidden');
+
+            // Display FAQ
+            let html = '';
+            faqData.forEach((item, index) => {
+                html += `
+                    <div class="faq-item">
+                        <div class="faq-question">Q${index + 1}: ${item.question}</div>
+                        <div class="faq-answer">A: ${item.answer}</div>
+                    </div>
+                `;
+            });
+            
+            outputDiv.innerHTML = html;
+        }
+
+        async function exportFAQ(format) {
+            if (generatedFAQ.length === 0) {
+                showMessage('No FAQ to export', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/export_faq', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        faq: generatedFAQ,
+                        format: format
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.error);
+                }
+
+                // Create download link
+                const blob = new Blob([result.content], { 
+                    type: format === 'html' ? 'text/html' : 'application/json' 
+                });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `faq.${format}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                showMessage(`${format.toUpperCase()} file downloaded successfully!`, 'success');
+                
+            } catch (error) {
+                showMessage('Export failed: ' + error.message, 'error');
+            }
+        }
+
+        // Initialize with text input
+        switchInputMethod('text');
+
+        // File upload handling
+        document.getElementById('file-upload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const fileStatus = document.getElementById('file-status');
+            const fileName = document.getElementById('file-name');
+            const fileSize = document.getElementById('file-size');
+            const uploadMessage = document.getElementById('upload-message');
+            const uploadProgress = document.getElementById('upload-progress');
+            const fileInfo = document.querySelector('.file-info');
+            
+            if (file) {
+                // Show file status
+                fileStatus.classList.remove('hidden');
+                
+                // Update file details
+                fileName.textContent = file.name;
+                fileSize.textContent = `(${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                
+                // Show processing status
+                uploadMessage.textContent = 'File selected. Ready to process.';
+                uploadMessage.className = 'upload-message';
+                fileInfo.className = 'file-info file-upload-processing';
+                
+                // Update upload label
+                const label = document.querySelector('.file-upload-label');
+                label.innerHTML = `
+                    <i class="fas fa-file"></i>
+                    <br>File Selected
+                    <br><small>${file.name}</small>
+                    <br><small style="color: #667eea;">Click "Generate FAQ" to process</small>
+                `;
+            } else {
+                // Hide file status if no file
+                fileStatus.classList.add('hidden');
+                
+                // Reset upload label
+                const label = document.querySelector('.file-upload-label');
+                label.innerHTML = `
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <br>Choose a file or drag it here
+                    <br><small>Supported: PDF, DOCX, TXT, MD (Max 16MB)</small>
+                `;
+            }
+        });
+    </script>
+</body>
+</html> 
