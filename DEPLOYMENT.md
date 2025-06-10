@@ -12,8 +12,8 @@ This guide provides multiple deployment options for your AI FAQ Generator applic
 
 1. **Clone the repository:**
    ```bash
-   git clone <your-repo-url>
-   cd ai-faq-generator
+   git clone https://github.com/manojvarma333/gemini-faq-tool.git
+   cd gemini-faq-tool
    ```
 
 2. **Install dependencies:**
@@ -75,7 +75,7 @@ Since this is a Flask application, GitHub Pages won't work for the full app, but
 ### 3. Railway Deployment
 
 1. **Go to [Railway](https://railway.app/)**
-2. **Connect your GitHub repository**
+2. **Connect your GitHub repository:** `manojvarma333/gemini-faq-tool`
 3. **Add environment variable:**
    - `GEMINI_API_KEY`: Your Gemini API key
 4. **Deploy automatically**
@@ -84,7 +84,7 @@ Since this is a Flask application, GitHub Pages won't work for the full app, but
 
 1. **Go to [Render](https://render.com/)**
 2. **Create new Web Service**
-3. **Connect your GitHub repository**
+3. **Connect your GitHub repository:** `manojvarma333/gemini-faq-tool`
 4. **Configure:**
    - **Build Command:** `pip install -r requirements.txt`
    - **Start Command:** `gunicorn app:app`
@@ -99,24 +99,24 @@ Since this is a Flask application, GitHub Pages won't work for the full app, but
 docker-compose up --build
 
 # Or build and run manually
-docker build -t ai-faq-generator .
-docker run -p 5000:5000 -e GEMINI_API_KEY=your_key ai-faq-generator
+docker build -t gemini-faq-tool .
+docker run -p 5000:5000 -e GEMINI_API_KEY=your_key gemini-faq-tool
 ```
 
 #### Docker Hub:
 1. **Build the image:**
    ```bash
-   docker build -t yourusername/ai-faq-generator .
+   docker build -t manojvarma333/gemini-faq-tool .
    ```
 
 2. **Push to Docker Hub:**
    ```bash
-   docker push yourusername/ai-faq-generator
+   docker push manojvarma333/gemini-faq-tool
    ```
 
 3. **Deploy anywhere:**
    ```bash
-   docker run -p 5000:5000 -e GEMINI_API_KEY=your_key yourusername/ai-faq-generator
+   docker run -p 5000:5000 -e GEMINI_API_KEY=your_key manojvarma333/gemini-faq-tool
    ```
 
 ### 6. Vercel Deployment
@@ -136,7 +136,7 @@ docker run -p 5000:5000 -e GEMINI_API_KEY=your_key ai-faq-generator
 ### 7. DigitalOcean App Platform
 
 1. **Go to DigitalOcean App Platform**
-2. **Connect your GitHub repository**
+2. **Connect your GitHub repository:** `manojvarma333/gemini-faq-tool`
 3. **Configure:**
    - **Build Command:** `pip install -r requirements.txt`
    - **Run Command:** `gunicorn app:app`
@@ -153,7 +153,7 @@ Set these in your deployment platform:
 ## 📁 Project Structure
 
 ```
-ai-faq-generator/
+gemini-faq-tool/
 ├── app.py                 # Main Flask application
 ├── requirements.txt       # Python dependencies
 ├── README.md             # Project documentation
@@ -246,4 +246,10 @@ Your AI FAQ Generator is now deployed and ready to use! Share the URL with other
 
 ---
 
-**Need help?** Check the troubleshooting section or create an issue in the repository. 
+**Need help?** Check the troubleshooting section or create an issue in the repository.
+
+## 👨‍💻 Author
+
+**Manoj Varma** - [GitHub](https://github.com/manojvarma333)
+
+**Repository:** [gemini-faq-tool](https://github.com/manojvarma333/gemini-faq-tool) 

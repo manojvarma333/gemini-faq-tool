@@ -24,7 +24,11 @@ An intelligent web application that automatically generates comprehensive FAQ se
 
 ### Setup Instructions
 
-1. **Clone or download the project files**
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/manojvarma333/gemini-faq-tool.git
+   cd gemini-faq-tool
+   ```
 
 2. **Install dependencies**:
    ```bash
@@ -104,6 +108,7 @@ Once generated, you can export your FAQ in two formats:
 
 ### File Structure
 ```
+gemini-faq-tool/
 ├── app.py                 # Main Flask application
 ├── requirements.txt       # Python dependencies
 ├── README.md             # Project documentation
@@ -222,6 +227,10 @@ If you encounter issues:
 - **Reliable**: Backed by Google's infrastructure
 - **Easy Integration**: Simple API with good documentation
 - **Multimodal**: Can handle text, images, and other content types
+
+## 👨‍💻 Author
+
+**Manoj Varma** - [GitHub](https://github.com/manojvarma333)
 
 ---
 
